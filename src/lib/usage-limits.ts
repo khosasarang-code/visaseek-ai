@@ -5,35 +5,36 @@ export const USAGE_STORAGE_KEY = "visaseek-daily-usage";
 export interface DailyUsage {
   date: string;
   count: number;
+  resetTime: number;
 }
 
-export function getTodayKey(): string {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+export function getResetTime(): number {
+  // Reset after 7 hours from first message
+  return Date.now() + 7 * 60 * 60 * 1000;
 }
 
 export function getDailyLimit(): number {
   if (hasPaidAccess()) return Infinity;
   if (isLoggedIn()) return 10;
-  return 5;
+  return 10;
 }
 
 export function getDailyUsage(): DailyUsage {
-  const today = getTodayKey();
+  const now = Date.now();
   if (typeof window === "undefined") {
-    return { date: today, count: 0 };
+    return { date: "", count: 0, resetTime: getResetTime() };
   }
   try {
     const raw = localStorage.getItem(USAGE_STORAGE_KEY);
-    if (!raw) return { date: today, count: 0 };
+    if (!raw) return { date: "", count: 0, resetTime: getResetTime() };
     const data = JSON.parse(raw) as DailyUsage;
-    if (data.date !== today) return { date: today, count: 0 };
+    // Reset if 7 hours have passed
+    if (now > data.resetTime) {
+      return { date: "", count: 0, resetTime: getResetTime() };
+    }
     return data;
   } catch {
-    return { date: today, count: 0 };
+    return { date: "", count: 0, resetTime: getResetTime() };
   }
 }
 
@@ -43,7 +44,11 @@ export function saveDailyUsage(usage: DailyUsage): void {
 
 export function incrementDailyUsage(): DailyUsage {
   const usage = getDailyUsage();
-  const next = { ...usage, count: usage.count + 1 };
+  const next = {
+    ...usage,
+    count: usage.count + 1,
+    resetTime: usage.resetTime || getResetTime(),
+  };
   saveDailyUsage(next);
   return next;
 }
@@ -62,4 +67,16 @@ export function isDailyLimitReached(): boolean {
 
 export function shouldShowUsageCounter(): boolean {
   return !hasPaidAccess();
+}
+
+export function getTimeUntilReset(): string {
+  const usage = getDailyUsage();
+  if (!usage.resetTime) return "7 hours";
+  const now = Date.now();
+  const diff = usage.resetTime - now;
+  if (diff <= 0) return "now";
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes} minutes`;
 }

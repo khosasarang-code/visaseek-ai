@@ -1,6 +1,5 @@
 "use client";
-
-import Link from "next/link";
+import { useState } from "react";
 import { Check } from "lucide-react";
 import AppShell from "@/components/AppShell";
 
@@ -10,6 +9,7 @@ const PLANS = [
     price: "Free",
     period: "forever",
     badge: null,
+    priceId: null,
     features: [
       "5 AI messages per day",
       "Basic immigration guidance",
@@ -23,6 +23,7 @@ const PLANS = [
     price: "$19",
     period: "/month",
     badge: "Most Popular",
+    priceId: "price_1TbEKD4QDqj9d1e5FsBNm6Zt",
     features: [
       "Unlimited AI messages",
       "File & image upload",
@@ -38,6 +39,7 @@ const PLANS = [
     price: "$49",
     period: "/month",
     badge: null,
+    priceId: "price_1TbELd4QDqj9d1e51AeVqCqi",
     features: [
       "Everything in Pro",
       "1 consultation call/month",
@@ -50,6 +52,33 @@ const PLANS = [
 ];
 
 export default function PricingPage() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  const handleCheckout = async (priceId: string | null, planName: string) => {
+    if (!priceId) {
+      window.location.href = "/";
+      return;
+    }
+    setLoadingPlan(planName);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <AppShell>
       <div className="px-6 py-12">
@@ -61,7 +90,6 @@ export default function PricingPage() {
             Choose the plan that fits your immigration journey
           </p>
         </div>
-
         <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
           {PLANS.map((plan) => (
             <div
@@ -86,25 +114,23 @@ export default function PricingPage() {
               </div>
               <ul className="mt-6 flex-1 space-y-3">
                 {plan.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-start gap-2 text-sm text-gray-600"
-                  >
+                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/signup"
-                className={`mt-8 block rounded-lg py-3 text-center text-sm font-medium transition ${
+              <button
+                onClick={() => handleCheckout(plan.priceId, plan.name)}
+                disabled={loadingPlan === plan.name}
+                className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-medium transition ${
                   plan.highlighted
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-900 text-white hover:bg-gray-800"
-                }`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {plan.cta}
-              </Link>
+                {loadingPlan === plan.name ? "Loading..." : plan.cta}
+              </button>
             </div>
           ))}
         </div>

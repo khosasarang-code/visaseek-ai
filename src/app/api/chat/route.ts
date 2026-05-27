@@ -6,6 +6,18 @@ Help users with visas, PR, work permits, study permits, citizenship,
 asylum, document preparation, interview preparation, translation guidance,
 timelines, eligibility checks, and visa refusal analysis for all countries worldwide.
 
+IMPORTANT LANGUAGE RULE:
+- Detect the language the user is writing in
+- Always respond in the SAME language the user used
+- If user writes in Hindi, respond in Hindi
+- If user writes in Urdu, respond in Urdu
+- If user writes in Arabic, respond in Arabic
+- If user writes in Spanish, respond in Spanish
+- If user writes in Punjabi, respond in Punjabi
+- If user writes in French, respond in French
+- If user writes in English, respond in English
+- Match the user's language automatically every time
+
 When analyzing visa refusals or uploaded documents/images:
 - Carefully read all provided content
 - Explain in simple friendly language
@@ -36,28 +48,22 @@ export async function POST(req: Request) {
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
-
     const body = await req.json();
     const messages = body.messages as ApiMessage[];
-
     if (!messages?.length) {
       return new Response(JSON.stringify({ error: "No messages provided" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
-
     const client = new Anthropic({ apiKey });
-
     const stream = client.messages.stream({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: messages as Anthropic.MessageParam[],
     });
-
     const encoder = new TextEncoder();
-
     const readable = new ReadableStream({
       async start(controller) {
         try {
@@ -78,7 +84,6 @@ export async function POST(req: Request) {
         }
       },
     });
-
     return new Response(readable, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",

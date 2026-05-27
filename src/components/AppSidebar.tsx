@@ -9,6 +9,9 @@ import {
   HelpCircle,
   CreditCard,
   X,
+  Calculator,
+  FileText,
+  Globe,
 } from "lucide-react";
 import VisaSeekLogo from "@/components/VisaSeekLogo";
 import { CATEGORIES } from "@/lib/categories";
@@ -27,6 +30,24 @@ interface AppSidebarProps {
   onSelectChat: (id: string) => void;
   onLogoClick?: () => void;
 }
+
+const TOOLS = [
+  {
+    href: "/tools/pr-calculator",
+    icon: <Calculator className="h-4 w-4" />,
+    label: "🇨🇦 PR Score Calculator",
+  },
+  {
+    href: "/tools/sop-generator",
+    icon: <FileText className="h-4 w-4" />,
+    label: "📄 SOP Generator",
+  },
+  {
+    href: "/tools/best-country",
+    icon: <Globe className="h-4 w-4" />,
+    label: "🌍 Best Country Finder",
+  },
+];
 
 export default function AppSidebar({
   isOpen,
@@ -107,6 +128,29 @@ export default function AppSidebar({
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 py-3">
+
+          {/* AI TOOLS SECTION */}
+          <p className="mb-2 px-2 text-xs font-semibold tracking-wider text-gray-500">
+            AI TOOLS
+          </p>
+          <nav className="space-y-0.5 mb-4">
+            {TOOLS.map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                onClick={onClose}
+                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition hover:bg-gray-200 ${
+                  pathname === tool.href
+                    ? "bg-blue-50 font-medium text-blue-900 border-l-4 border-blue-500 pl-2"
+                    : "text-gray-700 border-l-4 border-transparent"
+                }`}
+              >
+                {tool.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* IMMIGRATION TOPICS */}
           <p className="mb-2 px-2 text-xs font-semibold tracking-wider text-gray-500">
             IMMIGRATION TOPICS
           </p>

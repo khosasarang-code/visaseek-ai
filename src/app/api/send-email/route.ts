@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await resend.emails.send({
-      from: "VisaSeek AI <welcome@visaseekai.com>",
+      from: "VisaSeek AI <onboarding@resend.dev>",
       to: email,
       subject,
       html,

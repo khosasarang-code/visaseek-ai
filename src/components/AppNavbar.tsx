@@ -88,9 +88,7 @@ export default function AppNavbar({
   useEffect(() => {
     const ticker = tickerRef.current;
     if (!ticker) return;
-
-    const speed = 0.5;
-
+    const speed = 0.8;
     const animate = () => {
       posRef.current -= speed;
       const totalWidth = ticker.scrollWidth / 3;
@@ -100,7 +98,6 @@ export default function AppNavbar({
       ticker.style.transform = `translateX(${posRef.current}px)`;
       rafRef.current = requestAnimationFrame(animate);
     };
-
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
   }, [news]);
@@ -117,13 +114,7 @@ export default function AppNavbar({
   return (
     <header
       className="fixed top-0 right-0 left-0 z-30 border-b border-gray-200 bg-white md:left-64"
-      style={{
-        height: "56px",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 16px",
-        gap: "12px",
-      }}
+      style={{ height: "56px", display: "flex", alignItems: "center", padding: "0 16px", gap: "12px" }}
     >
       {showMenuButton && (
         <button
@@ -137,23 +128,10 @@ export default function AppNavbar({
         </button>
       )}
 
-      {/* LIVE NEWS TICKER */}
-      <div style={{
-        flex: 1,
-        overflow: "hidden",
-        minWidth: 0,
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-      }}>
+      <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
         <div
           ref={tickerRef}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            whiteSpace: "nowrap",
-            willChange: "transform",
-          }}
+          style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}
         >
           {tickerItems.map((item, index) => (
             
@@ -161,24 +139,9 @@ export default function AppNavbar({
               href={item.link || "https://visaseekai.com/news"}
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                fontSize: "12px",
-                paddingRight: "48px",
-                color: "#6B7280",
-                textDecoration: "none",
-                flexShrink: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = "#2563EB";
-                e.currentTarget.style.textDecoration = "underline";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = "#6B7280";
-                e.currentTarget.style.textDecoration = "none";
-              }}
+              style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", textDecoration: "none", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
             >
               <span>{item.country}</span>
               <span>{item.title}</span>
@@ -188,28 +151,13 @@ export default function AppNavbar({
         </div>
       </div>
 
-      {/* Login/Signup */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        flexShrink: 0,
-      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
         {user ? (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt="Profile"
-                style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid #E5E7EB" }}
-              />
+              <img src={user.avatar} alt="Profile" style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid #E5E7EB" }} />
             ) : (
-              <div style={{
-                width: "32px", height: "32px", borderRadius: "50%",
-                background: "#111", color: "white", display: "flex",
-                alignItems: "center", justifyContent: "center",
-                fontSize: "12px", fontWeight: "500",
-              }}>
+              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#111", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "500" }}>
                 {user.name?.charAt(0).toUpperCase()}
               </div>
             )}
@@ -218,37 +166,17 @@ export default function AppNavbar({
             </span>
             <button
               onClick={handleSignOut}
-              style={{
-                padding: "6px 12px", borderRadius: "8px",
-                border: "1px solid #E5E7EB", background: "white",
-                fontSize: "14px", cursor: "pointer", fontWeight: "500",
-              }}
+              style={{ padding: "6px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "white", fontSize: "14px", cursor: "pointer", fontWeight: "500" }}
             >
               Sign out
             </button>
           </div>
         ) : (
           <>
-            <Link
-              href="/login"
-              style={{
-                padding: "8px 16px", borderRadius: "8px",
-                background: "#111", color: "white",
-                fontSize: "14px", fontWeight: "500",
-                textDecoration: "none",
-              }}
-            >
+            <Link href="/login" style={{ padding: "8px 16px", borderRadius: "8px", background: "#111", color: "white", fontSize: "14px", fontWeight: "500", textDecoration: "none" }}>
               Log in
             </Link>
-            <Link
-              href="/signup"
-              style={{
-                padding: "8px 16px", borderRadius: "8px",
-                border: "1px solid #E5E7EB", background: "white",
-                color: "#111", fontSize: "14px", fontWeight: "500",
-                textDecoration: "none",
-              }}
-            >
+            <Link href="/signup" style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "white", color: "#111", fontSize: "14px", fontWeight: "500", textDecoration: "none" }}>
               Sign up for free
             </Link>
           </>

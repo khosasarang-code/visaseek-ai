@@ -49,7 +49,7 @@ export default function AppShell({ children, onLogoClick }: AppShellProps) {
           showMenuButton
           onMenuClick={() => setSidebarOpen(true)}
         />
-        <main className="flex-1 pt-14">{children}</main>
+        <main className="flex-1 pt-24">{children}</main>
       </div>
     </div>
   );

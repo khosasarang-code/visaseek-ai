@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthUser, clearAuthUser } from "@/lib/auth-storage";
 
@@ -22,12 +22,26 @@ interface AppNavbarProps {
   showMenuButton?: boolean;
 }
 
+const DEFAULT_NEWS: NewsItem[] = [
+  { title: "Canada Express Entry draw — CRS cutoff 485 — 2,750 invitations", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
+  { title: "UK visa processing extended to 12 weeks due to surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
+  { title: "Australia increases migration places to 195,000 for 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
+  { title: "Germany Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
+  { title: "UAE Golden Visa fees updated for investors in 2025", country: "🇦🇪", link: "https://u.ae/en" },
+  { title: "USA H-1B lottery reforms announced for FY2026", country: "🇺🇸", link: "https://www.uscis.gov/news" },
+  { title: "New Zealand reopens skilled migrant residence pathway", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
+  { title: "Portugal Digital Nomad visa income requirement raised to €2,700", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
+];
+
 export default function AppNavbar({
   onMenuClick,
   showMenuButton = false,
 }: AppNavbarProps) {
   const [user, setUser] = useState<any>(null);
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [news, setNews] = useState<NewsItem[]>(DEFAULT_NEWS);
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef(0);
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -63,18 +77,33 @@ export default function AppNavbar({
 
     fetch("/api/ticker-news")
       .then(r => r.json())
-      .then(data => setNews(data.news || []))
-      .catch(() => setNews([
-        { title: "Canada Express Entry — CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
-        { title: "UK visa processing extended to 12 weeks due to surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
-        { title: "Australia increases migration places to 195,000 for 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
-        { title: "Germany Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
-        { title: "UAE Golden Visa fees updated for investors", country: "🇦🇪", link: "https://u.ae/en" },
-        { title: "USA H-1B lottery reforms announced for FY2026", country: "🇺🇸", link: "https://www.uscis.gov/news" },
-      ]));
+      .then(data => {
+        if (data.news?.length > 0) setNews(data.news);
+      })
+      .catch(() => {});
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const ticker = tickerRef.current;
+    if (!ticker) return;
+
+    const speed = 0.5;
+
+    const animate = () => {
+      posRef.current -= speed;
+      const totalWidth = ticker.scrollWidth / 3;
+      if (Math.abs(posRef.current) >= totalWidth) {
+        posRef.current = 0;
+      }
+      ticker.style.transform = `translateX(${posRef.current}px)`;
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [news]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -87,91 +116,113 @@ export default function AppNavbar({
 
   return (
     <header
-      className="fixed top-0 right-0 left-0 z-30 flex h-14 items-center border-b border-gray-200 bg-white px-4 md:left-64"
-      style={{ gap: "12px" }}
+      className="fixed top-0 right-0 left-0 z-30 border-b border-gray-200 bg-white md:left-64"
+      style={{
+        height: "56px",
+        display: "flex",
+        alignItems: "center",
+        padding: "0 16px",
+        gap: "12px",
+      }}
     >
       {showMenuButton && (
         <button
           type="button"
           onClick={onMenuClick}
-          className="rounded-lg p-2 hover:bg-gray-100 md:hidden flex-shrink-0"
+          className="rounded-lg p-2 hover:bg-gray-100 md:hidden"
+          style={{ flexShrink: 0 }}
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5 text-gray-700" />
         </button>
       )}
 
-      {/* TICKER inside navbar */}
+      {/* LIVE NEWS TICKER */}
       <div style={{
         flex: 1,
         overflow: "hidden",
         minWidth: 0,
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
       }}>
-        {tickerItems.length > 0 && (
-          <>
-            <div style={{
-              display: "flex",
-              animation: "navticker 25s linear infinite",
-              whiteSpace: "nowrap",
-            }}>
-              {tickerItems.map((item, index) => (
-                
-                  key={index}
-                  href={item.link || "https://visaseekai.com/news"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontSize: "12px",
-                    paddingRight: "40px",
-                    color: "#6B7280",
-                    textDecoration: "none",
-                    flexShrink: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    cursor: "pointer",
-                    transition: "color 0.2s",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "#2563EB")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}
-                >
-                  <span>{item.country}</span>
-                  <span>{item.title}</span>
-                  <span style={{ marginLeft: "20px", color: "#E5E7EB" }}>•</span>
-                </a>
-              ))}
-            </div>
-            <style>{`
-              @keyframes navticker {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-33.333%); }
-              }
-            `}</style>
-          </>
-        )}
+        <div
+          ref={tickerRef}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            whiteSpace: "nowrap",
+            willChange: "transform",
+          }}
+        >
+          {tickerItems.map((item, index) => (
+            
+              key={index}
+              href={item.link || "https://visaseekai.com/news"}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: "12px",
+                paddingRight: "48px",
+                color: "#6B7280",
+                textDecoration: "none",
+                flexShrink: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = "#2563EB";
+                e.currentTarget.style.textDecoration = "underline";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = "#6B7280";
+                e.currentTarget.style.textDecoration = "none";
+              }}
+            >
+              <span>{item.country}</span>
+              <span>{item.title}</span>
+              <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* Login/Signup */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        flexShrink: 0,
+      }}>
         {user ? (
-          <div className="flex items-center gap-2">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {user.avatar ? (
               <img
                 src={user.avatar}
                 alt="Profile"
-                className="h-8 w-8 rounded-full border border-gray-200"
+                style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid #E5E7EB" }}
               />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-medium text-white">
+              <div style={{
+                width: "32px", height: "32px", borderRadius: "50%",
+                background: "#111", color: "white", display: "flex",
+                alignItems: "center", justifyContent: "center",
+                fontSize: "12px", fontWeight: "500",
+              }}>
                 {user.name?.charAt(0).toUpperCase()}
               </div>
             )}
-            <span className="hidden text-sm font-medium text-gray-800 md:block">
+            <span style={{ fontSize: "14px", fontWeight: "500", color: "#111" }} className="hidden md:block">
               {user.name}
             </span>
             <button
               onClick={handleSignOut}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 transition hover:bg-gray-50"
+              style={{
+                padding: "6px 12px", borderRadius: "8px",
+                border: "1px solid #E5E7EB", background: "white",
+                fontSize: "14px", cursor: "pointer", fontWeight: "500",
+              }}
             >
               Sign out
             </button>
@@ -180,13 +231,23 @@ export default function AppNavbar({
           <>
             <Link
               href="/login"
-              className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+              style={{
+                padding: "8px 16px", borderRadius: "8px",
+                background: "#111", color: "white",
+                fontSize: "14px", fontWeight: "500",
+                textDecoration: "none",
+              }}
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-50"
+              style={{
+                padding: "8px 16px", borderRadius: "8px",
+                border: "1px solid #E5E7EB", background: "white",
+                color: "#111", fontSize: "14px", fontWeight: "500",
+                textDecoration: "none",
+              }}
             >
               Sign up for free
             </Link>

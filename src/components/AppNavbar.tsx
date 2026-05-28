@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { getAuthUser, clearAuthUser } from "@/lib/auth-storage";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,13 +23,36 @@ export default function AppNavbar({
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    // Check Supabase Google login
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email,
+          avatar: session.user.user_metadata?.avatar_url,
+          type: "google",
+        });
+        return;
+      }
+      // Check email signup from localStorage
+      const localUser = getAuthUser();
+      if (localUser) {
+        setUser({
+          name: localUser.name || localUser.email,
+          avatar: null,
+          type: "email",
+        });
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
+        if (session?.user) {
+          setUser({
+            name: session.user.user_metadata?.full_name || session.user.email,
+            avatar: session.user.user_metadata?.avatar_url,
+            type: "google",
+          });
+        }
       }
     );
 
@@ -37,6 +61,7 @@ export default function AppNavbar({
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    clearAuthUser();
     setUser(null);
     window.location.href = "/";
   };
@@ -65,15 +90,19 @@ export default function AppNavbar({
       <div className="flex items-center gap-2">
         {user ? (
           <div className="flex items-center gap-3">
-            {user.user_metadata?.avatar_url && (
+            {user.avatar ? (
               <img
-                src={user.user_metadata.avatar_url}
+                src={user.avatar}
                 alt="Profile"
                 className="h-8 w-8 rounded-full border border-gray-200"
               />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-medium text-white">
+                {user.name?.charAt(0).toUpperCase()}
+              </div>
             )}
             <span className="hidden text-sm font-medium text-gray-800 md:block">
-              {user.user_metadata?.full_name || user.email}
+              {user.name}
             </span>
             <button
               onClick={handleSignOut}

@@ -23,7 +23,6 @@ export default function AppNavbar({
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Check Supabase Google login
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({
@@ -33,7 +32,6 @@ export default function AppNavbar({
         });
         return;
       }
-      // Check email signup from localStorage
       const localUser = getAuthUser();
       if (localUser) {
         setUser({
@@ -79,14 +77,11 @@ export default function AppNavbar({
             <Menu className="h-5 w-5 text-gray-700" />
           </button>
         )}
-        <div className="hidden flex-1 md:block" />
-        <button
-          type="button"
-          className="flex items-center gap-1 text-sm font-medium text-gray-800 md:absolute md:left-1/2 md:-translate-x-1/2"
-        >
-          VisaSeek AI <span className="text-gray-400">▾</span>
-        </button>
       </div>
+
+      {/* Empty center — no VisaSeek AI text */}
+      <div className="flex-1" />
+
       <div className="flex items-center gap-2">
         {user ? (
           <div className="flex items-center gap-3">

@@ -38,8 +38,18 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-screen bg-white antialiased">
-        <NewsTicker />
-        {children}
+        <div style={{ paddingTop: "36px" }}>
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 50,
+          }}>
+            <NewsTicker />
+          </div>
+          {children}
+        </div>
       </body>
     </html>
   );

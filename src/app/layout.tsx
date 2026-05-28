@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import NewsTicker from "@/components/NewsTicker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,18 +37,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-screen bg-white antialiased">
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 40,
-        }}>
-          <NewsTicker />
-        </div>
-        <div style={{ paddingTop: "36px" }}>
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

@@ -14,6 +14,7 @@ export default function LoginForm() {
     const email = (form.get("email") as string)?.trim();
     if (!email) return;
     setAuthUser({ email, plan: "free" });
+    localStorage.removeItem("visaseek-daily-usage");
     router.push("/");
   };
 

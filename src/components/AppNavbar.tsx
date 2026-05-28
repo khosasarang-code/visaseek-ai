@@ -65,11 +65,11 @@ export default function AppNavbar({
       .then(r => r.json())
       .then(data => setNews(data.news || []))
       .catch(() => setNews([
-        { title: "Canada Express Entry draw — CRS cutoff 485", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
-        { title: "UK visa processing times extended to 12 weeks", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
-        { title: "Australia increases migration places to 195,000", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
-        { title: "Germany Blue Card expanded to new professions", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
-        { title: "UAE Golden Visa fees updated for 2025", country: "🇦🇪", link: "https://u.ae/en" },
+        { title: "Canada Express Entry — CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
+        { title: "UK visa processing extended to 12 weeks due to surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
+        { title: "Australia increases migration places to 195,000 for 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
+        { title: "Germany Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
+        { title: "UAE Golden Visa fees updated for investors", country: "🇦🇪", link: "https://u.ae/en" },
         { title: "USA H-1B lottery reforms announced for FY2026", country: "🇺🇸", link: "https://www.uscis.gov/news" },
       ]));
 
@@ -86,65 +86,72 @@ export default function AppNavbar({
   const tickerItems = [...news, ...news, ...news];
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-30 flex h-14 items-center border-b border-gray-200 bg-white px-4 md:left-64">
-      
-      {/* Menu button for mobile */}
+    <header
+      className="fixed top-0 right-0 left-0 z-30 flex h-14 items-center border-b border-gray-200 bg-white px-4 md:left-64"
+      style={{ gap: "12px" }}
+    >
       {showMenuButton && (
         <button
           type="button"
           onClick={onMenuClick}
-          className="mr-2 rounded-lg p-2 hover:bg-gray-100 md:hidden"
+          className="rounded-lg p-2 hover:bg-gray-100 md:hidden flex-shrink-0"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5 text-gray-700" />
         </button>
       )}
 
-      {/* NEWS TICKER — center of navbar */}
-      {news.length > 0 && (
-        <div style={{
-          flex: 1,
-          overflow: "hidden",
-          margin: "0 12px",
-        }}>
-          <div style={{
-            display: "flex",
-            animation: "navticker 30s linear infinite",
-            whiteSpace: "nowrap",
-          }}>
-            {tickerItems.map((item, index) => (
-              
-                key={index}
-                href={item.link || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontSize: "12px",
-                  paddingRight: "40px",
-                  color: "#374151",
-                  textDecoration: "none",
-                  flexShrink: 0,
-                  cursor: "pointer",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#2563EB")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#374151")}
-              >
-                <span style={{ marginRight: "6px" }}>{item.country}</span>
-                {item.title}
-                <span style={{ margin: "0 20px", color: "#D1D5DB" }}>•</span>
-              </a>
-            ))}
-          </div>
-          <style>{`
-            @keyframes navticker {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-33.333%); }
-            }
-          `}</style>
-        </div>
-      )}
+      {/* TICKER inside navbar */}
+      <div style={{
+        flex: 1,
+        overflow: "hidden",
+        minWidth: 0,
+      }}>
+        {tickerItems.length > 0 && (
+          <>
+            <div style={{
+              display: "flex",
+              animation: "navticker 25s linear infinite",
+              whiteSpace: "nowrap",
+            }}>
+              {tickerItems.map((item, index) => (
+                
+                  key={index}
+                  href={item.link || "https://visaseekai.com/news"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: "12px",
+                    paddingRight: "40px",
+                    color: "#6B7280",
+                    textDecoration: "none",
+                    flexShrink: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    cursor: "pointer",
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#2563EB")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}
+                >
+                  <span>{item.country}</span>
+                  <span>{item.title}</span>
+                  <span style={{ marginLeft: "20px", color: "#E5E7EB" }}>•</span>
+                </a>
+              ))}
+            </div>
+            <style>{`
+              @keyframes navticker {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-33.333%); }
+              }
+            `}</style>
+          </>
+        )}
+      </div>
 
-      {/* Login/Signup buttons */}
+      {/* Login/Signup */}
       <div className="flex items-center gap-2 flex-shrink-0">
         {user ? (
           <div className="flex items-center gap-2">

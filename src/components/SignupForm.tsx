@@ -8,13 +8,30 @@ import { setAuthUser } from "@/lib/auth-storage";
 export default function SignupForm() {
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const email = (form.get("email") as string)?.trim();
     const name = (form.get("name") as string)?.trim();
     if (!email) return;
+    
     setAuthUser({ email, name, plan: "free" });
+
+    // Send welcome email
+    try {
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          name: name || "there",
+          type: "welcome",
+        }),
+      });
+    } catch (error) {
+      console.error("Welcome email failed:", error);
+    }
+
     router.push("/");
   };
 

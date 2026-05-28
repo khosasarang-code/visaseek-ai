@@ -16,6 +16,7 @@ export default function SignupForm() {
     if (!email) return;
     
     setAuthUser({ email, name, plan: "free" });
+    localStorage.removeItem("visaseek-daily-usage");
 
     // Send welcome email
     try {

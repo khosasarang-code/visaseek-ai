@@ -65,7 +65,7 @@ export default function AppNavbar({
   };
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:left-64">
+    <header className="fixed top-9 right-0 left-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:left-64">
       <div className="flex items-center gap-3">
         {showMenuButton && (
           <button
@@ -79,7 +79,6 @@ export default function AppNavbar({
         )}
       </div>
 
-      {/* Empty center — no VisaSeek AI text */}
       <div className="flex-1" />
 
       <div className="flex items-center gap-2">

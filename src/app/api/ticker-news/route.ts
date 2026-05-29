@@ -7,6 +7,19 @@ const client = new Anthropic({
 
 export const revalidate = 3600;
 
+const COUNTRY_LINKS: Record<string, string> = {
+  "🇨🇦": "https://www.canada.ca/en/immigration-refugees-citizenship/news.html",
+  "🇬🇧": "https://www.gov.uk/government/news",
+  "🇦🇺": "https://immi.homeaffairs.gov.au",
+  "🇺🇸": "https://www.uscis.gov/news",
+  "🇩🇪": "https://www.make-it-in-germany.com",
+  "🇦🇪": "https://u.ae/en",
+  "🇳🇿": "https://www.immigration.govt.nz",
+  "🇵🇹": "https://vistos.mne.gov.pt",
+  "🇮🇪": "https://enterprise.gov.ie",
+  "🌍": "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en",
+};
+
 export async function GET() {
   try {
     const today = new Date().toLocaleDateString("en-US", {
@@ -68,21 +81,25 @@ Make the headlines realistic, specific with numbers, and relevant to today's dat
       throw new Error("No JSON array found");
     }
 
-    const news = JSON.parse(jsonMatch[0]);
+    const rawNews = JSON.parse(jsonMatch[0]);
+    const news = rawNews.map((item: { title: string; country: string }) => ({
+      ...item,
+      link: COUNTRY_LINKS[item.country] || "https://visaseekai.com",
+    }));
 
     return NextResponse.json({ news });
   } catch (error) {
     console.error("Ticker news error:", error);
     return NextResponse.json({
       news: [
-        { title: "Canada Express Entry draw — CRS cutoff 491 — 3,800 invitations issued", country: "🇨🇦" },
-        { title: "UK Skilled Worker visa salary threshold raised to £38,700", country: "🇬🇧" },
-        { title: "Australia announces 195,000 permanent migration places for 2025", country: "🇦🇺" },
-        { title: "Germany Opportunity Card now open to skilled workers worldwide", country: "🇩🇪" },
-        { title: "UAE Golden Visa expanded to new professions and graduates", country: "🇦🇪" },
-        { title: "USA H-1B lottery registration opens — 85,000 cap reached", country: "🇺🇸" },
-        { title: "New Zealand Green List pathway reopened for skilled migrants", country: "🇳🇿" },
-        { title: "Portugal Digital Nomad visa processing reduced to 4 weeks", country: "🇵🇹" },
+        { title: "Canada Express Entry draw — CRS cutoff 491 — 3,800 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
+        { title: "UK Skilled Worker visa salary threshold raised to £38,700", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
+        { title: "Australia announces 195,000 permanent migration places for 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
+        { title: "Germany Opportunity Card now open to skilled workers worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
+        { title: "UAE Golden Visa expanded to new professions and graduates", country: "🇦🇪", link: "https://u.ae/en" },
+        { title: "USA H-1B lottery registration opens — 85,000 cap reached", country: "🇺🇸", link: "https://www.uscis.gov/news" },
+        { title: "New Zealand Green List pathway reopened for skilled migrants", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
+        { title: "Portugal Digital Nomad visa processing reduced to 4 weeks", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
       ],
     });
   }

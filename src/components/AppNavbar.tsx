@@ -21,14 +21,23 @@ interface AppNavbarProps {
   showMenuButton?: boolean;
 }
 
+const getCountryName = (flag: string) => {
+  const map: Record<string, string> = {
+    "🇨🇦": "Canada", "🇬🇧": "UK", "🇦🇺": "Australia",
+    "🇩🇪": "Germany", "🇦🇪": "UAE", "🇺🇸": "USA",
+    "🇳🇿": "NZ", "🇵🇹": "Portugal", "🇮🇪": "Ireland", "🌍": "Global",
+  };
+  return map[flag] || flag;
+};
+
 const DEFAULT_NEWS: NewsItem[] = [
   { title: "Express Entry draw CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
   { title: "Visa processing extended to 12 weeks due to application surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
-  { title: "Increases migration places to 195,000 for skilled workers 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
+  { title: "Migration places increased to 195,000 for skilled workers 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
   { title: "Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
   { title: "Golden Visa fees updated for investors and graduates", country: "🇦🇪", link: "https://u.ae/en" },
   { title: "H-1B lottery reforms announced for FY2026 registration", country: "🇺🇸", link: "https://www.uscis.gov/news" },
-  { title: "Reopens skilled migrant residence pathway for applicants", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
+  { title: "Skilled migrant residence pathway reopened for applicants", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
   { title: "Digital Nomad visa income requirement raised to 2700 euros", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
   { title: "Critical Skills work permit expanded to healthcare workers", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/" },
   { title: "Schengen visa fees increase to 90 euros from June 2025", country: "🌍", link: "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en" },
@@ -37,7 +46,7 @@ const DEFAULT_NEWS: NewsItem[] = [
 export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNavbarProps) {
   const [user, setUser] = useState<any>(null);
   const [news, setNews] = useState<NewsItem[]>(DEFAULT_NEWS);
-  const tickerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(0);
   const rafRef = useRef<number>(0);
 
@@ -68,14 +77,35 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
   }, []);
 
   useEffect(() => {
-    const ticker = tickerRef.current;
-    if (!ticker) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const tickerItems = [...news, ...news, ...news];
+    const html = tickerItems.map(item => `
+      
+        href="${item.link || '#'}"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="font-size:12px;padding-right:48px;color:#6B7280;text-decoration:none;flex-shrink:0;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"
+        onmouseover="this.style.color='#2563EB';this.style.textDecoration='underline'"
+        onmouseout="this.style.color='#6B7280';this.style.textDecoration='none'"
+      >
+        <span style="font-size:16px">${item.country}</span>
+        <span style="font-weight:500;color:#374151">${getCountryName(item.country)}</span>
+        <span style="color:#9CA3AF">—</span>
+        <span>${item.title}</span>
+        <span style="margin-left:24px;color:#E5E7EB">●</span>
+      </a>
+    `).join('');
+
+    container.innerHTML = html;
+
     const speed = 0.8;
     const animate = () => {
       posRef.current -= speed;
-      const totalWidth = ticker.scrollWidth / 3;
+      const totalWidth = container.scrollWidth / 3;
       if (Math.abs(posRef.current) >= totalWidth) { posRef.current = 0; }
-      ticker.style.transform = `translateX(${posRef.current}px)`;
+      container.style.transform = `translateX(${posRef.current}px)`;
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
@@ -89,18 +119,6 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
     window.location.href = "/";
   };
 
-  const handleNewsClick = (link: string | undefined) => {
-    if (link) {
-      const newTab = window.open();
-      if (newTab) {
-        newTab.opener = null;
-        newTab.location.href = link;
-      }
-    }
-  };
-
-  const tickerItems = [...news, ...news, ...news];
-
   return (
     <header className="fixed top-0 right-0 left-0 z-30 border-b border-gray-200 bg-white md:left-64" style={{ height: "56px", display: "flex", alignItems: "center", padding: "0 16px", gap: "12px" }}>
       {showMenuButton && (
@@ -110,25 +128,10 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
       )}
 
       <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
-        <div ref={tickerRef} style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}>
-          {tickerItems.map((item, index) => {
-            return (
-              <span
-                key={index}
-                onClick={() => handleNewsClick(item.link)}
-                style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
-              >
-                <span style={{ fontSize: "16px" }}>{item.country}</span>
-                <span style={{ fontWeight: "500", color: "#374151" }}>{item.country === "🇨🇦" ? "Canada" : item.country === "🇬🇧" ? "UK" : item.country === "🇦🇺" ? "Australia" : item.country === "🇩🇪" ? "Germany" : item.country === "🇦🇪" ? "UAE" : item.country === "🇺🇸" ? "USA" : item.country === "🇳🇿" ? "NZ" : item.country === "🇵🇹" ? "Portugal" : item.country === "🇮🇪" ? "Ireland" : "Global"}</span>
-                <span style={{ color: "#9CA3AF" }}>—</span>
-                <span>{item.title}</span>
-                <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
-              </span>
-            );
-          })}
-        </div>
+        <div
+          ref={containerRef}
+          style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}
+        />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>

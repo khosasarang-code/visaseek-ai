@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthUser, clearAuthUser } from "@/lib/auth-storage";
+import TickerItem from "@/components/TickerItem";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,19 +23,12 @@ interface AppNavbarProps {
 }
 
 const getCountryName = (flag: string) => {
-  const map: Record<string, string> = {
-    "\uD83C\uDDE8\uD83C\uDDE6": "Canada",
-    "\uD83C\uDDEC\uD83C\uDDE7": "UK",
-    "\uD83C\uDDE6\uD83C\uDDFA": "Australia",
-    "\uD83C\uDDE9\uD83C\uDDEA": "Germany",
-    "\uD83C\uDDE6\uD83C\uDDEA": "UAE",
-    "\uD83C\uDDFA\uD83C\uDDF8": "USA",
-    "\uD83C\uDDF3\uD83C\uDDFF": "NZ",
-    "\uD83C\uDDF5\uD83C\uDDF9": "Portugal",
-    "\uD83C\uDDEE\uD83C\uDDEA": "Ireland",
-    "\uD83C\uDF0D": "Global",
+  const names: Record<string, string> = {
+    "🇨🇦": "Canada", "🇬🇧": "UK", "🇦🇺": "Australia",
+    "🇩🇪": "Germany", "🇦🇪": "UAE", "🇺🇸": "USA",
+    "🇳🇿": "NZ", "🇵🇹": "Portugal", "🇮🇪": "Ireland", "🌍": "Global",
   };
-  return map[flag] || "News";
+  return names[flag] || "News";
 };
 
 const DEFAULT_NEWS: NewsItem[] = [
@@ -118,22 +112,13 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
       <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
         <div ref={tickerRef} style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}>
           {tickerItems.map((item, index) => (
-            <span
+            <TickerItem
               key={index}
-              role="link"
-              tabIndex={0}
-              onClick={() => { if (item.link) { window.location.href = item.link; } }}
-              onKeyDown={(e) => { if (e.key === "Enter" && item.link) { window.location.href = item.link; } }}
-              style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
-            >
-              <span style={{ fontSize: "16px" }}>{item.country}</span>
-              <span style={{ fontWeight: "600", color: "#111827" }}>{getCountryName(item.country)}</span>
-              <span style={{ color: "#9CA3AF" }}>—</span>
-              <span>{item.title}</span>
-              <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
-            </span>
+              country={item.country}
+              countryName={getCountryName(item.country)}
+              title={item.title}
+              link={item.link || "#"}
+            />
           ))}
         </div>
       </div>

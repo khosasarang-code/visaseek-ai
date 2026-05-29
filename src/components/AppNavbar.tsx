@@ -30,6 +30,8 @@ const DEFAULT_NEWS: NewsItem[] = [
   { title: "USA H1B lottery reforms announced for FY2026", country: "🇺🇸", link: "https://www.uscis.gov/news" },
   { title: "New Zealand reopens skilled migrant residence pathway", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
   { title: "Portugal Digital Nomad visa income requirement raised", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
+  { title: "Ireland expands Critical Skills work permit categories", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/" },
+  { title: "Schengen visa fees increase to 90 euros from June 2025", country: "🌍", link: "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en" },
 ];
 
 export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNavbarProps) {
@@ -103,7 +105,11 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
             return (
               <span
                 key={index}
-                onClick={() => window.open(item.link || "https://visaseekai.com/news", "_blank")}
+                onClick={() => {
+                  if (item.link) {
+                    window.open(item.link, "_blank", "noopener,noreferrer");
+                  }
+                }}
                 style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}

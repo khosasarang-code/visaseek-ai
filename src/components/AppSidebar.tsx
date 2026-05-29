@@ -12,6 +12,7 @@ import {
   Calculator,
   FileText,
   Globe,
+  Trash2,
 } from "lucide-react";
 import VisaSeekLogo from "@/components/VisaSeekLogo";
 import { CATEGORIES } from "@/lib/categories";
@@ -29,6 +30,8 @@ interface AppSidebarProps {
   activeChatId: string | null;
   onSelectChat: (id: string) => void;
   onLogoClick?: () => void;
+  onDeleteChat?: (id: string) => void;
+  onClearAllChats?: () => void;
 }
 
 const TOOLS = [
@@ -61,6 +64,8 @@ export default function AppSidebar({
   activeChatId,
   onSelectChat,
   onLogoClick,
+  onDeleteChat,
+  onClearAllChats,
 }: AppSidebarProps) {
   const pathname = usePathname();
   const filteredChats = chats.filter((c) =>
@@ -129,7 +134,6 @@ export default function AppSidebar({
 
         <div className="flex-1 overflow-y-auto px-2 py-3">
 
-          {/* AI TOOLS SECTION */}
           <p className="mb-2 px-2 text-xs font-semibold tracking-wider text-gray-500">
             AI TOOLS
           </p>
@@ -150,7 +154,6 @@ export default function AppSidebar({
             ))}
           </nav>
 
-          {/* IMMIGRATION TOPICS */}
           <p className="mb-2 px-2 text-xs font-semibold tracking-wider text-gray-500">
             IMMIGRATION TOPICS
           </p>
@@ -180,52 +183,67 @@ export default function AppSidebar({
 
           {filteredChats.length > 0 && (
             <div className="mt-4 border-t border-gray-200 pt-3">
-              <p className="mb-2 px-2 text-xs font-semibold tracking-wider text-gray-500">
-                RECENT CHATS
-              </p>
+              <div className="flex items-center justify-between mb-2 px-2">
+                <p className="text-xs font-semibold tracking-wider text-gray-500">
+                  RECENT CHATS
+                </p>
+                {onClearAllChats && (
+                  <button
+                    type="button"
+                    onClick={onClearAllChats}
+                    className="text-xs text-red-400 hover:text-red-600 transition"
+                    title="Clear all chats"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
               {filteredChats.map((chat) => (
-                <button
+                <div
                   key={chat.id}
-                  type="button"
-                  onClick={() => {
-                    onSelectChat(chat.id);
-                    onClose();
-                  }}
-                  className={`mb-0.5 w-full truncate rounded-lg px-3 py-2 text-left text-sm transition hover:bg-gray-200 ${
-                    activeChatId === chat.id
-                      ? "bg-gray-200 font-medium text-gray-900"
-                      : "text-gray-600"
+                  className={`group mb-0.5 flex items-center rounded-lg transition hover:bg-gray-200 ${
+                    activeChatId === chat.id ? "bg-gray-200" : ""
                   }`}
                 >
-                  {chat.title}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSelectChat(chat.id);
+                      onClose();
+                    }}
+                    className="flex-1 truncate px-3 py-2 text-left text-sm text-gray-600"
+                  >
+                    {chat.title}
+                  </button>
+                  {onDeleteChat && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteChat(chat.id);
+                      }}
+                      className="mr-2 hidden rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-500 group-hover:block"
+                      title="Delete chat"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           )}
         </div>
 
         <div className="space-y-1 border-t border-gray-200 p-3">
-          <Link
-            href="/settings"
-            onClick={onClose}
-            className={navLinkClass("/settings")}
-          >
+          <Link href="/settings" onClick={onClose} className={navLinkClass("/settings")}>
             <Settings className="h-4 w-4" />
             Settings
           </Link>
-          <Link
-            href="/help"
-            onClick={onClose}
-            className={navLinkClass("/help")}
-          >
+          <Link href="/help" onClick={onClose} className={navLinkClass("/help")}>
             <HelpCircle className="h-4 w-4" />
             Help
           </Link>
-          <Link
-            href="/pricing"
-            onClick={onClose}
-            className={navLinkClass("/pricing")}
-          >
+          <Link href="/pricing" onClick={onClose} className={navLinkClass("/pricing")}>
             <CreditCard className="h-4 w-4" />
             See plans &amp; pricing
           </Link>

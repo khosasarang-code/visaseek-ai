@@ -8,11 +8,15 @@ interface TickerItemProps {
 }
 
 export default function TickerItem({ country, countryName, title, link }: TickerItemProps) {
+  const handleClick = () => {
+    const win = window.open(link, "_blank");
+    if (win) win.focus();
+  };
+
   return (
-    
-      href={link}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      type="button"
+      onClick={handleClick}
       style={{
         fontSize: "12px",
         paddingRight: "48px",
@@ -23,6 +27,10 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
         gap: "6px",
         cursor: "pointer",
         textDecoration: "none",
+        background: "none",
+        border: "none",
+        padding: "0 48px 0 0",
+        font: "inherit",
       }}
       onMouseEnter={e => {
         e.currentTarget.style.color = "#2563EB";
@@ -38,6 +46,6 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
       <span style={{ color: "#9CA3AF" }}>—</span>
       <span>{title}</span>
       <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
-    </a>
+    </button>
   );
 }

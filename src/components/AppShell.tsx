@@ -1,5 +1,4 @@
 "use client";
-
 import AppNavbar from "@/components/AppNavbar";
 import AppSidebar from "@/components/AppSidebar";
 import { useAppChats } from "@/hooks/useAppChats";
@@ -20,6 +19,8 @@ export default function AppShell({ children, onLogoClick }: AppShellProps) {
     goHome,
     handleNewChat,
     handleCategoryClick,
+    deleteChat,
+    clearAllChats,
   } = useAppChats();
 
   if (!hydrated) {
@@ -43,6 +44,8 @@ export default function AppShell({ children, onLogoClick }: AppShellProps) {
         activeChatId={null}
         onSelectChat={() => goHome()}
         onLogoClick={onLogoClick ?? goHome}
+        onDeleteChat={deleteChat}
+        onClearAllChats={clearAllChats}
       />
       <div className="flex min-h-screen flex-1 flex-col md:ml-64">
         <AppNavbar

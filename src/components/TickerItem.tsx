@@ -13,7 +13,6 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
       style={{
         fontSize: "12px",
         paddingRight: "48px",
-        color: "#6B7280",
         flexShrink: 0,
         display: "inline-flex",
         alignItems: "center",
@@ -26,19 +25,7 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
           alignItems: "center",
           gap: "6px",
           cursor: "pointer",
-          textDecoration: "none",
-          color: "inherit",
-        }}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const a = document.createElement("a");
-          a.href = link;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+          color: "#6B7280",
         }}
         onMouseEnter={e => {
           e.currentTarget.style.color = "#2563EB";
@@ -47,6 +34,16 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
         onMouseLeave={e => {
           e.currentTarget.style.color = "#6B7280";
           e.currentTarget.style.textDecoration = "none";
+        }}
+        onMouseDown={() => {
+          sessionStorage.setItem("ticker_link", link);
+        }}
+        onMouseUp={() => {
+          const savedLink = sessionStorage.getItem("ticker_link");
+          if (savedLink) {
+            sessionStorage.removeItem("ticker_link");
+            window.open(savedLink, "_blank", "noopener,noreferrer");
+          }
         }}
       >
         <span style={{ fontSize: "16px" }}>{country}</span>

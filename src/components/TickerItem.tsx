@@ -17,40 +17,25 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
         display: "inline-flex",
         alignItems: "center",
         gap: "6px",
+        cursor: "pointer",
+        color: "#6B7280",
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.color = "#2563EB";
+        e.currentTarget.style.textDecoration = "underline";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.color = "#6B7280";
+        e.currentTarget.style.textDecoration = "none";
+      }}
+      onPointerUp={() => {
+        window.location.assign(link);
       }}
     >
-      <span
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          cursor: "pointer",
-          color: "#6B7280",
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.color = "#2563EB";
-          e.currentTarget.style.textDecoration = "underline";
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.color = "#6B7280";
-          e.currentTarget.style.textDecoration = "none";
-        }}
-        onMouseDown={() => {
-          sessionStorage.setItem("ticker_link", link);
-        }}
-        onMouseUp={() => {
-          const savedLink = sessionStorage.getItem("ticker_link");
-          if (savedLink) {
-            sessionStorage.removeItem("ticker_link");
-            window.open(savedLink, "_blank", "noopener,noreferrer");
-          }
-        }}
-      >
-        <span style={{ fontSize: "16px" }}>{country}</span>
-        <span style={{ fontWeight: "600", color: "#111827" }}>{countryName}</span>
-        <span style={{ color: "#9CA3AF" }}>—</span>
-        <span>{title}</span>
-      </span>
+      <span style={{ fontSize: "16px" }}>{country}</span>
+      <span style={{ fontWeight: "600", color: "#111827" }}>{countryName}</span>
+      <span style={{ color: "#9CA3AF" }}>—</span>
+      <span>{title}</span>
       <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
     </span>
   );

@@ -23,11 +23,18 @@ interface AppNavbarProps {
 
 const getCountryName = (flag: string) => {
   const map: Record<string, string> = {
-    "🇨🇦": "Canada", "🇬🇧": "UK", "🇦🇺": "Australia",
-    "🇩🇪": "Germany", "🇦🇪": "UAE", "🇺🇸": "USA",
-    "🇳🇿": "NZ", "🇵🇹": "Portugal", "🇮🇪": "Ireland", "🌍": "Global",
+    "\uD83C\uDDE8\uD83C\uDDE6": "Canada",
+    "\uD83C\uDDEC\uD83C\uDDE7": "UK",
+    "\uD83C\uDDE6\uD83C\uDDFA": "Australia",
+    "\uD83C\uDDE9\uD83C\uDDEA": "Germany",
+    "\uD83C\uDDE6\uD83C\uDDEA": "UAE",
+    "\uD83C\uDDFA\uD83C\uDDF8": "USA",
+    "\uD83C\uDDF3\uD83C\uDDFF": "NZ",
+    "\uD83C\uDDF5\uD83C\uDDF9": "Portugal",
+    "\uD83C\uDDEE\uD83C\uDDEA": "Ireland",
+    "\uD83C\uDF0D": "Global",
   };
-  return map[flag] || flag;
+  return map[flag] || "News";
 };
 
 const DEFAULT_NEWS: NewsItem[] = [
@@ -46,7 +53,7 @@ const DEFAULT_NEWS: NewsItem[] = [
 export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNavbarProps) {
   const [user, setUser] = useState<any>(null);
   const [news, setNews] = useState<NewsItem[]>(DEFAULT_NEWS);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const tickerRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(0);
   const rafRef = useRef<number>(0);
 
@@ -77,35 +84,14 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
   }, []);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const tickerItems = [...news, ...news, ...news];
-    const html = tickerItems.map(item => `
-      
-        href="${item.link || '#'}"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="font-size:12px;padding-right:48px;color:#6B7280;text-decoration:none;flex-shrink:0;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"
-        onmouseover="this.style.color='#2563EB';this.style.textDecoration='underline'"
-        onmouseout="this.style.color='#6B7280';this.style.textDecoration='none'"
-      >
-        <span style="font-size:16px">${item.country}</span>
-        <span style="font-weight:500;color:#374151">${getCountryName(item.country)}</span>
-        <span style="color:#9CA3AF">—</span>
-        <span>${item.title}</span>
-        <span style="margin-left:24px;color:#E5E7EB">●</span>
-      </a>
-    `).join('');
-
-    container.innerHTML = html;
-
+    const ticker = tickerRef.current;
+    if (!ticker) return;
     const speed = 0.8;
     const animate = () => {
       posRef.current -= speed;
-      const totalWidth = container.scrollWidth / 3;
+      const totalWidth = ticker.scrollWidth / 3;
       if (Math.abs(posRef.current) >= totalWidth) { posRef.current = 0; }
-      container.style.transform = `translateX(${posRef.current}px)`;
+      ticker.style.transform = `translateX(${posRef.current}px)`;
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
@@ -119,6 +105,8 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
     window.location.href = "/";
   };
 
+  const tickerItems = [...news, ...news, ...news];
+
   return (
     <header className="fixed top-0 right-0 left-0 z-30 border-b border-gray-200 bg-white md:left-64" style={{ height: "56px", display: "flex", alignItems: "center", padding: "0 16px", gap: "12px" }}>
       {showMenuButton && (
@@ -128,10 +116,26 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
       )}
 
       <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
-        <div
-          ref={containerRef}
-          style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}
-        />
+        <div ref={tickerRef} style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}>
+          {tickerItems.map((item, index) => (
+            <span
+              key={index}
+              role="link"
+              tabIndex={0}
+              onClick={() => { if (item.link) { window.location.href = item.link; } }}
+              onKeyDown={(e) => { if (e.key === "Enter" && item.link) { window.location.href = item.link; } }}
+              style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
+            >
+              <span style={{ fontSize: "16px" }}>{item.country}</span>
+              <span style={{ fontWeight: "600", color: "#111827" }}>{getCountryName(item.country)}</span>
+              <span style={{ color: "#9CA3AF" }}>—</span>
+              <span>{item.title}</span>
+              <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
+            </span>
+          ))}
+        </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>

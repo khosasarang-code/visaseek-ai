@@ -13,6 +13,10 @@ function loadChats(): ChatSession[] {
   }
 }
 
+function saveChats(chats: ChatSession[]): void {
+  localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(chats));
+}
+
 export function useAppChats() {
   const router = useRouter();
   const [chats, setChats] = useState<ChatSession[]>([]);
@@ -46,6 +50,24 @@ export function useAppChats() {
     router.push("/");
   };
 
+  const deleteChat = (chatId: string) => {
+    const updated = chats.filter(c => c.id !== chatId);
+    setChats(updated);
+    saveChats(updated);
+    const activeChat = localStorage.getItem("visaseek-active-chat");
+    if (activeChat === chatId) {
+      localStorage.removeItem("visaseek-active-chat");
+      router.push("/");
+    }
+  };
+
+  const clearAllChats = () => {
+    setChats([]);
+    saveChats([]);
+    localStorage.removeItem("visaseek-active-chat");
+    router.push("/");
+  };
+
   return {
     chats,
     searchQuery,
@@ -57,5 +79,7 @@ export function useAppChats() {
     goToChat,
     handleNewChat,
     handleCategoryClick,
+    deleteChat,
+    clearAllChats,
   };
 }

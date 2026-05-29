@@ -4,7 +4,6 @@ import { Menu } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthUser, clearAuthUser } from "@/lib/auth-storage";
-import TickerItem from "@/components/TickerItem";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -50,6 +49,7 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
   const tickerRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(0);
   const rafRef = useRef<number>(0);
+  const pausedRef = useRef(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -82,10 +82,12 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
     if (!ticker) return;
     const speed = 0.8;
     const animate = () => {
-      posRef.current -= speed;
-      const totalWidth = ticker.scrollWidth / 3;
-      if (Math.abs(posRef.current) >= totalWidth) { posRef.current = 0; }
-      ticker.style.transform = `translateX(${posRef.current}px)`;
+      if (!pausedRef.current) {
+        posRef.current -= speed;
+        const totalWidth = ticker.scrollWidth / 3;
+        if (Math.abs(posRef.current) >= totalWidth) { posRef.current = 0; }
+        ticker.style.transform = `translateX(${posRef.current}px)`;
+      }
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
@@ -109,16 +111,30 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
         </button>
       )}
 
-      <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
+      <div
+        style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}
+        onMouseEnter={() => { pausedRef.current = true; }}
+        onMouseLeave={() => { pausedRef.current = false; }}
+      >
         <div ref={tickerRef} style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}>
           {tickerItems.map((item, index) => (
-            <TickerItem
+            <span
               key={index}
-              country={item.country}
-              countryName={getCountryName(item.country)}
-              title={item.title}
-              link={item.link || "#"}
-            />
+              style={{ fontSize: "12px", paddingRight: "48px", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#6B7280" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
+              onClick={() => {
+                if (item.link) {
+                  window.open(item.link, "_blank", "noopener,noreferrer");
+                }
+              }}
+            >
+              <span style={{ fontSize: "16px" }}>{item.country}</span>
+              <span style={{ fontWeight: "600", color: "#111827" }}>{getCountryName(item.country)}</span>
+              <span style={{ color: "#9CA3AF" }}>—</span>
+              <span>{item.title}</span>
+              <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
+            </span>
           ))}
         </div>
       </div>

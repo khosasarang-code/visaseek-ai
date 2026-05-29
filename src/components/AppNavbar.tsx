@@ -22,15 +22,15 @@ interface AppNavbarProps {
 }
 
 const DEFAULT_NEWS: NewsItem[] = [
-  { title: "Canada Express Entry draw CRS cutoff 485 2750 invitations", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
-  { title: "UK visa processing extended to 12 weeks due to surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
-  { title: "Australia increases migration places to 195000 for 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
-  { title: "Germany Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
-  { title: "UAE Golden Visa fees updated for investors in 2025", country: "🇦🇪", link: "https://u.ae/en" },
-  { title: "USA H1B lottery reforms announced for FY2026", country: "🇺🇸", link: "https://www.uscis.gov/news" },
-  { title: "New Zealand reopens skilled migrant residence pathway", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
-  { title: "Portugal Digital Nomad visa income requirement raised", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
-  { title: "Ireland expands Critical Skills work permit categories", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/" },
+  { title: "Express Entry draw CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
+  { title: "Visa processing extended to 12 weeks due to application surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
+  { title: "Increases migration places to 195,000 for skilled workers 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
+  { title: "Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
+  { title: "Golden Visa fees updated for investors and graduates", country: "🇦🇪", link: "https://u.ae/en" },
+  { title: "H-1B lottery reforms announced for FY2026 registration", country: "🇺🇸", link: "https://www.uscis.gov/news" },
+  { title: "Reopens skilled migrant residence pathway for applicants", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
+  { title: "Digital Nomad visa income requirement raised to 2700 euros", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
+  { title: "Critical Skills work permit expanded to healthcare workers", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/" },
   { title: "Schengen visa fees increase to 90 euros from June 2025", country: "🌍", link: "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en" },
 ];
 
@@ -89,6 +89,16 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
     window.location.href = "/";
   };
 
+  const handleNewsClick = (link: string | undefined) => {
+    if (link) {
+      const newTab = window.open();
+      if (newTab) {
+        newTab.opener = null;
+        newTab.location.href = link;
+      }
+    }
+  };
+
   const tickerItems = [...news, ...news, ...news];
 
   return (
@@ -105,16 +115,14 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
             return (
               <span
                 key={index}
-                onClick={() => {
-                  if (item.link) {
-                    window.open(item.link, "_blank", "noopener,noreferrer");
-                  }
-                }}
+                onClick={() => handleNewsClick(item.link)}
                 style={{ fontSize: "12px", paddingRight: "48px", color: "#6B7280", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
               >
-                <span>{item.country}</span>
+                <span style={{ fontSize: "16px" }}>{item.country}</span>
+                <span style={{ fontWeight: "500", color: "#374151" }}>{item.country === "🇨🇦" ? "Canada" : item.country === "🇬🇧" ? "UK" : item.country === "🇦🇺" ? "Australia" : item.country === "🇩🇪" ? "Germany" : item.country === "🇦🇪" ? "UAE" : item.country === "🇺🇸" ? "USA" : item.country === "🇳🇿" ? "NZ" : item.country === "🇵🇹" ? "Portugal" : item.country === "🇮🇪" ? "Ireland" : "Global"}</span>
+                <span style={{ color: "#9CA3AF" }}>—</span>
                 <span>{item.title}</span>
                 <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
               </span>

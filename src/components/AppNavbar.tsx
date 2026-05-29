@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthUser, clearAuthUser } from "@/lib/auth-storage";
 
@@ -46,10 +46,6 @@ const DEFAULT_NEWS: NewsItem[] = [
 export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNavbarProps) {
   const [user, setUser] = useState<any>(null);
   const [news, setNews] = useState<NewsItem[]>(DEFAULT_NEWS);
-  const tickerRef = useRef<HTMLDivElement>(null);
-  const posRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  const pausedRef = useRef(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -77,23 +73,6 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const ticker = tickerRef.current;
-    if (!ticker) return;
-    const speed = 0.8;
-    const animate = () => {
-      if (!pausedRef.current) {
-        posRef.current -= speed;
-        const totalWidth = ticker.scrollWidth / 3;
-        if (Math.abs(posRef.current) >= totalWidth) { posRef.current = 0; }
-        ticker.style.transform = `translateX(${posRef.current}px)`;
-      }
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [news]);
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     clearAuthUser();
@@ -102,6 +81,7 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
   };
 
   const tickerItems = [...news, ...news, ...news];
+  const tickerWidth = tickerItems.length * 400;
 
   return (
     <header className="fixed top-0 right-0 left-0 z-30 border-b border-gray-200 bg-white md:left-64" style={{ height: "56px", display: "flex", alignItems: "center", padding: "0 16px", gap: "12px" }}>
@@ -111,30 +91,39 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
         </button>
       )}
 
-      <div
-        style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}
-        onMouseEnter={() => { pausedRef.current = true; }}
-        onMouseLeave={() => { pausedRef.current = false; }}
-      >
-        <div ref={tickerRef} style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap", willChange: "transform" }}>
+      <div style={{ flex: 1, overflow: "hidden", minWidth: 0, height: "100%", display: "flex", alignItems: "center" }}>
+        <style>{`
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.333%); }
+          }
+          .ticker-track {
+            animation: scroll 40s linear infinite;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+          }
+          .ticker-track:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
+        <div className="ticker-track" style={{ width: `${tickerWidth}px` }}>
           {tickerItems.map((item, index) => (
-            <span
+            
               key={index}
-              style={{ fontSize: "12px", paddingRight: "48px", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#6B7280" }}
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: "12px", paddingRight: "48px", flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", color: "#6B7280", textDecoration: "none" }}
               onMouseEnter={e => { e.currentTarget.style.color = "#2563EB"; e.currentTarget.style.textDecoration = "underline"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.textDecoration = "none"; }}
-              onClick={() => {
-                if (item.link) {
-                  window.open(item.link, "_blank", "noopener,noreferrer");
-                }
-              }}
             >
               <span style={{ fontSize: "16px" }}>{item.country}</span>
               <span style={{ fontWeight: "600", color: "#111827" }}>{getCountryName(item.country)}</span>
               <span style={{ color: "#9CA3AF" }}>—</span>
               <span>{item.title}</span>
               <span style={{ marginLeft: "24px", color: "#E5E7EB" }}>●</span>
-            </span>
+            </a>
           ))}
         </div>
       </div>

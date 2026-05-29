@@ -109,7 +109,7 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
         `}</style>
         <div className="ticker-track" style={{ width: `${tickerWidth}px` }}>
           {tickerItems.map((item, index) => (
-            
+            <a
               key={index}
               href={item.link}
               target="_blank"

@@ -29,7 +29,9 @@ export default function TickerItem({ country, countryName, title, link }: Ticker
         e.currentTarget.style.textDecoration = "none";
       }}
       onPointerUp={() => {
-        window.location.assign(link);
+        if (link && link !== "#") {
+          window.open(link, "_blank", "noopener,noreferrer");
+        }
       }}
     >
       <span style={{ fontSize: "16px" }}>{country}</span>

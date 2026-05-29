@@ -31,15 +31,15 @@ const getCountryName = (flag: string) => {
 };
 
 const DEFAULT_NEWS: NewsItem[] = [
-  { title: "Express Entry draw CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/news.html" },
-  { title: "Visa processing extended to 12 weeks due to application surge", country: "🇬🇧", link: "https://www.gov.uk/government/news" },
-  { title: "Migration places increased to 195,000 for skilled workers 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au" },
-  { title: "Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com" },
-  { title: "Golden Visa fees updated for investors and graduates", country: "🇦🇪", link: "https://u.ae/en" },
-  { title: "H-1B lottery reforms announced for FY2026 registration", country: "🇺🇸", link: "https://www.uscis.gov/news" },
-  { title: "Skilled migrant residence pathway reopened for applicants", country: "🇳🇿", link: "https://www.immigration.govt.nz" },
-  { title: "Digital Nomad visa income requirement raised to 2700 euros", country: "🇵🇹", link: "https://vistos.mne.gov.pt" },
-  { title: "Critical Skills work permit expanded to healthcare workers", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/" },
+  { title: "Express Entry draw CRS cutoff 485 — 2,750 invitations issued", country: "🇨🇦", link: "https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds.html" },
+  { title: "Visa processing extended to 12 weeks due to application surge", country: "🇬🇧", link: "https://www.gov.uk/check-uk-visa" },
+  { title: "Migration places increased to 195,000 for skilled workers 2025", country: "🇦🇺", link: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing" },
+  { title: "Blue Card expanded to new professions worldwide", country: "🇩🇪", link: "https://www.make-it-in-germany.com/en/visa-residence/types/eu-blue-card" },
+  { title: "Golden Visa fees updated for investors and graduates", country: "🇦🇪", link: "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visas/golden-visa" },
+  { title: "H-1B lottery reforms announced for FY2026 registration", country: "🇺🇸", link: "https://www.uscis.gov/working-in-the-united-states/h-1b-specialty-occupations" },
+  { title: "Skilled migrant residence pathway reopened for applicants", country: "🇳🇿", link: "https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/about-visa/skilled-migrant-category-resident-visa" },
+  { title: "Digital Nomad visa income requirement raised to 2700 euros", country: "🇵🇹", link: "https://vistos.mne.gov.pt/en/national-visas/required-documentation/work" },
+  { title: "Critical Skills work permit expanded to healthcare workers", country: "🇮🇪", link: "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/permit-types/critical-skills-employment-permit/" },
   { title: "Schengen visa fees increase to 90 euros from June 2025", country: "🌍", link: "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en" },
 ];
 
@@ -109,7 +109,7 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
         `}</style>
         <div className="ticker-track" style={{ width: `${tickerWidth}px` }}>
           {tickerItems.map((item, index) => (
-            <a
+            
               key={index}
               href={item.link}
               target="_blank"

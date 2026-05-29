@@ -98,7 +98,7 @@ export default function AppNavbar({ onMenuClick, showMenuButton = false }: AppNa
             100% { transform: translateX(-33.333%); }
           }
           .ticker-track {
-            animation: scroll 40s linear infinite;
+            animation: scroll 80s linear infinite;
             display: flex;
             align-items: center;
             white-space: nowrap;
